@@ -1,4 +1,19 @@
-# Playwright Performance Metrics
+<h1 align="center">playwright-performance-metrics</h1>
+</p>
+<p align="center">
+   <a href="https://github.com/Valiantsin2021/playwright-performance-metrics/tags/"><img src="https://img.shields.io/github/tag/Valiantsin2021/playwright-performance-metrics" alt="playwwright-performance versions" /></a>
+   <a href="https://www.npmjs.com/package/playwright-performance-metrics"><img alt="playwright-performance-metrics available on NPM" src="https://img.shields.io/npm/dy/playwright-performance-metrics"></a>
+   <a href="http://makeapullrequest.com"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs are welcome" /></a>
+   <a href="https://github.com/Valiantsin2021/playwright-performance-metrics/issues/"><img src="https://img.shields.io/github/issues/Valiantsin2021/playwright-performance-metrics" alt="playwright-performance-metrics issues" /></a>
+   <img src="https://img.shields.io/github/stars/Valiantsin2021/playwright-performance-metrics" alt="playwright-performance-metrics stars" />
+   <img src="https://img.shields.io/github/forks/Valiantsin2021/playwright-performance-metrics" alt="playwright-performance-metrics forks" />
+   <img src="https://img.shields.io/github/license/Valiantsin2021/playwright-performance-metrics" alt="playwright-performance-metrics license" />
+   <a href="https://GitHub.com/Valiantsin2021/playwright-performance-metrics/graphs/commit-activity"><img src="https://img.shields.io/badge/Maintained%3F-yes-green.svg" alt="playwright-performance-metrics is maintained" /></a>
+   <a href="https://github.com/Valiantsin2021/playwright-performance-metrics"><img src="https://img.shields.io/badge/Author-Valentin%20Lutchanka-blue" alt="playwright-performance-metrics author" /></a>
+   <a href="https://github.com/Valiantsin2021/playwright-performance-metrics/actions/workflows/ci.yml"><img src="https://github.com/Valiantsin2021/playwright-performance-metrics/actions/workflows/ci.yml/badge.svg?branch=main" alt="playwright-performance-metrics ci tests" /></a>
+</p>
+
+---
 
 A comprehensive performance metrics collector for Playwright tests. Collect and analyze web vital metrics, network timing, and resource usage in your Playwright tests.
 
@@ -10,6 +25,89 @@ A comprehensive performance metrics collector for Playwright tests. Collect and 
 - Resource usage tracking
 - TypeScript support
 - Easy integration with Playwright tests
+
+## Concept
+
+The playwright-performance-metrics plugin introduces a powerful way to measure and assert on web performance metrics directly in your Playwright tests. Unlike traditional end-to-end testing that focuses on functionality, this plugin enables teams to catch performance regressions early and maintain high performance standards through automated testing.
+
+This plugin does not have external dependencies.
+
+**Comparison with playwright-lighthouse**
+
+Both plugins focus on performance testing, but they serve different purposes:
+
+**playwright-performance-metrics**
+
+- **Real-time metrics** during test execution
+- **Lower overhead** - no need for separate Lighthouse runs
+- **Less configuration** - minimal setup required for basic usage
+- **Specific metric focus** - [Core Web Vitals](https://www.hostinger.com/tutorials/core--web-vitals) and key timings
+- **Test integration** - natural fit in existing test flows
+- **Retry capability** - built-in retriability mechanisms to ensure the metrics are collected
+- **Resource timing** - detailed resource-level metrics
+- **Total bytes** - size of all resources
+- **Time to first byte** - detailed time to first byte metrics
+
+**playwright-lighthouse**
+
+- **Comprehensive audits** including SEO, accessibility
+- **Scoring system** aligned with Lighthouse
+- **Static analysis** of best practices
+- **Recommendations** for improvements
+- **Performance simulation** under various conditions
+- **Broader metrics** beyond just performance
+
+**Key Features**
+
+- Real-time performance metrics collection during test execution
+- Built-in retry mechanisms for reliable measurements
+- Support for Core Web Vitals and other key performance indicators
+- Seamless integration with existing Playwright tests
+- Type definitions for TypeScript support
+- Configurable thresholds and timing options
+
+The collectMetrics returns the object containing the collected performance metrics:
+
+```
+  PerformanceMetrics {
+      pageloadTiming: number
+      domCompleteTiming: number | null
+      resourceTiming: (resource: string) => PerformanceResourceTiming | undefined
+      largestContentfulPaint: number
+      totalBlockingTime: number
+      paint: { firstContentfulPaint: number; firstPaint: number }
+      cumulativeLayoutShift: number
+      totalBytes: number
+      timeToFirstByte: {
+        total: number
+        redirect: number
+        dns: number
+        connection: number
+        tls: number
+        wait: number
+      }
+    }
+```
+
+**Available Metrics**
+
+| **Metric** | **Description** | **Typical Threshold** |
+| --- | --- | --- |
+| largestContentfulPaint | Time until largest content element is visible | < 2500ms |
+| totalBlockingTime | Sum of blocking time for long tasks | < 300ms |
+| cumulativeLayoutShift | Measure of visual stability | < 0.1 |
+| paint.firstContentfulPaint | Time until first meaningful content appears | < 1800ms |
+| paint.firstPaint | Time until first pixel is painted | < 1000ms |
+| pageloadTiming | Total page load time | < 3000ms |
+| domCompleteTiming | Time until DOM is fully loaded | < 2500ms |
+| resourceTiming | Time until resource is fully loaded | < 500ms |
+| totalBytes | Size of all resources | < 1.5 MB |
+| timeToFirstByte.total | Time to first byte | < 500ms |
+| timeToFirstByte.dns | DNS time | < 20ms |
+| timeToFirstByte.wait | Wait time | < 50ms |
+| timeToFirstByte.redirect | Redirect time | < 50ms |
+| timeToFirstByte.tls | TLS time | < 50ms |
+| timeToFirstByte.connection | Connection time | < 50ms |
 
 ## Installation
 
@@ -80,8 +178,6 @@ constructor(page: Page)
 Collects performance metrics from the page.
 
 Options:
-- `startMark`: Performance mark to use as start time
-- `endMark`: Performance mark to use as end time
 - `timeout`: Collection timeout in milliseconds
 - `initialDelay`: Initial delay before starting collection
 - `retryTimeout`: Maximum time to retry collecting metrics

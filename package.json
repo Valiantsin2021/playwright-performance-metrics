@@ -1,6 +1,6 @@
 {
   "name": "playwright-performance-metrics",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A performance metrics collection library for Playwright",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
