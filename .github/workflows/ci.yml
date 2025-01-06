@@ -14,4 +14,3 @@ jobs:
 
       - name: Format and lint code ☑️
         run: npm run prepublishOnly
-        
