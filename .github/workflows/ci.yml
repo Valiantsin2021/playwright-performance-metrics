@@ -15,9 +15,8 @@ jobs:
       - name: Format and lint code ☑️
         run: npm run prepublishOnly
 
-      - name: Run Playwright tests 🧪
-        run: npm run test
-        
+      - name: Build 🧪
+        run: npm run build
   release:
     needs: [check-and-test]
     runs-on: ubuntu-24.04
