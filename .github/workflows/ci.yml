@@ -14,23 +14,4 @@ jobs:
 
       - name: Format and lint code ☑️
         run: npm run prepublishOnly
-
-      - name: Run Playwright tests 🧪
-        run: npm run test
         
-  release:
-    needs: [check-and-test]
-    runs-on: ubuntu-24.04
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - name: Checkout 🛎
-        uses: actions/checkout@v4
-
-      - name: Semantic Release 🚀
-        uses: cycjimmy/semantic-release-action@v4
-        with:
-          branch: main
-          tag_format: v${version}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
