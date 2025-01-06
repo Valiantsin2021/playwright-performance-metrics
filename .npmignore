@@ -1,0 +1,11 @@
+src
+tests
+.gitignore
+eslint.config.js
+.prettierignore
+.prettier.json
+tsconfig.json
+*.log
+test-results
+.hooks
+playwright.config.js

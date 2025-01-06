@@ -1,0 +1,76 @@
+{
+  "name": "playwright-performance-metrics",
+  "version": "1.0.2",
+  "description": "A performance metrics collection library for Playwright",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "LICENSE",
+    "Readme.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "playwright test",
+    "lint": "eslint src/*.ts",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm test && npm run lint",
+    "preversion": "npm run lint",
+    "version": "git add -A src",
+    "postversion": "git push && git push --tags"
+  },
+  "keywords": [
+    "playwright",
+    "performance",
+    "metrics",
+    "web-vitals",
+    "testing"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Valiantsin2021 /playwright-performance-collector.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Valiantsin2021 /playwright-performance-collector/issues"
+  },
+  "homepage": "https://github.com/Valiantsin2021  /playwright-performance-collector#readme",
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "lint-staged": {
+    "src/*.+(cjs|js|ts|tsx)": [
+      "eslint src/*.ts"
+    ],
+    "**/*.+(cjs|js|ts|json)": [
+      "prettier --cache --write",
+      "git add"
+    ]
+  },
+  "peerDependencies": {
+    "@playwright/test": ">=1.40.0 <2.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@playwright/test": {
+      "optional": false
+    }
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.6.1",
+    "@commitlint/config-conventional": "19.6.0",
+    "@playwright/test": "^1.49.1",
+    "@types/node": "22.10.5",
+    "eslint": "9.17.0",
+    "eslint-config-prettier": "9.1.0",
+    "eslint-plugin-prettier": "5.2.1",
+    "prettier": "3.4.2",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.19.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
