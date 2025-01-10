@@ -1,11 +1,11 @@
 // @ts-check
-import { defineConfig } from '@playwright/test'
+import { defineConfig, devices } from '@playwright/test'
 
 /**
  * @see https://playwright.dev/docs/test-configuration
  */
 export default defineConfig({
-  // workers: 3,
+  workers: 1,
   timeout: 45_000,
   expect: {
     timeout: 25_000
@@ -37,9 +37,7 @@ export default defineConfig({
     {
       name: 'Performance_tests',
       testMatch: /.*.spec.ts/,
-      use: {
-        channel: 'chrome'
-      }
+      use: { ...devices['Desktop Chrome'], channel: 'chrome' }
     }
   ]
 })

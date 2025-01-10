@@ -17,18 +17,13 @@ export interface NetworkConditions {
 }
 /**
  * Configuration options for performance metrics collection
- * @property startMark - Performance mark to start measuring from
- * @property endMark - Performance mark to end measuring at
  * @property timeout - Maximum time to wait for metrics collection
- * @property initialDelay - Initial delay before starting collection
  * @property retryTimeout - Maximum time to retry collecting metrics
  * @property networkConditions - Network emulation settings
  */
 export interface PerformanceOptions {
   /** Maximum time to wait for metrics collection (ms) */
   timeout?: number
-  /** Initial delay before starting collection (ms) */
-  initialDelay?: number
   /** Maximum time to retry collecting metrics (ms) */
   retryTimeout?: number
   /** Network emulation settings */

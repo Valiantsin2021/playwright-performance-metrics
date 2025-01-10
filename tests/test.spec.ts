@@ -10,9 +10,8 @@ test('Measure website performance default options', async () => {
   await page.goto('')
   const basicMetrics = await collector.collectMetrics({
     timeout: 15000,
-    initialDelay: 2000
+    retryTimeout: 500
   })
-
   console.log('Basic Metrics:', {
     'Time to First Byte': basicMetrics.timeToFirstByte?.total,
     'DOM Complete': basicMetrics.domCompleteTiming,
@@ -42,8 +41,7 @@ test('Slow Network metrics', async () => {
   const collector = new PerformanceMetricsCollector(page)
   const slowNetworkMetrics = await collector.collectMetrics({
     networkConditions: DefaultNetworkPresets.SLOW_3G,
-    timeout: 30000,
-    initialDelay: 1000
+    timeout: 30000
   })
 
   console.log('Slow 3G Metrics:', {

@@ -12,14 +12,13 @@
    <a href="https://github.com/Valiantsin2021/playwright-performance-metrics"><img src="https://img.shields.io/badge/Author-Valentin%20Lutchanka-blue" alt="playwright-performance-metrics author" /></a>
    <a href="https://github.com/Valiantsin2021/playwright-performance-metrics/actions/workflows/ci.yml"><img src="https://github.com/Valiantsin2021/playwright-performance-metrics/actions/workflows/ci.yml/badge.svg?branch=main" alt="playwright-performance-metrics ci tests" /></a>
 </p>
+<h3 align="center">A comprehensive performance metrics collector for Playwright tests. Collect and analyze web vital metrics, network timing, and resource usage in your Playwright tests.</h3>
+<img src="img\performance-UI.png" alt="Performance-UI" />
 
----
-
-A comprehensive performance metrics collector for Playwright tests. Collect and analyze web vital metrics, network timing, and resource usage in your Playwright tests.
 
 ## Features
 
-- Collect Web Vitals (LCP, FID, CLS)
+- Collect Web Vitals (LCP, CLS)
 - Network timing metrics (TTFB, resource timing)
 - Network condition emulation (3G, 4G, WiFi)
 - Resource usage tracking
@@ -117,7 +116,9 @@ npm install -D playwright-performance-metrics
 
 ## Usage
 
-Basic usage:
+**Basic usage:**
+
+* Note: it is important to wait the completion of the page load before collecting metrics.
 
 ```typescript
 import { test } from '@playwright/test';
@@ -126,8 +127,7 @@ import { PerformanceMetricsCollector } from 'playwright-performance-metrics';
 test('measure page performance', async ({ page }) => {
   const collector = new PerformanceMetricsCollector(page);
   
-  await page.goto('https://example.com');
-  
+  await page.goto('https://example.com', { waitUntil: 'networkidle' })
   const metrics = await collector.collectMetrics({
     timeout: 10000,
     initialDelay: 1000
@@ -139,17 +139,37 @@ test('measure page performance', async ({ page }) => {
     'Largest Contentful Paint': metrics.largestContentfulPaint,
     'Cumulative Layout Shift': metrics.cumulativeLayoutShift
   });
+  expect(metrics.pageloadTiming, 'Page load time is less than 2000ms').toBeLessThan(2000)
+  expect(metrics.domCompleteTiming, 'DOM Complete is less than 900ms').toBeLessThan(900)
+  expect(metrics.paint?.firstContentfulPaint, 'First Contentful Paint is less than 2000ms').toBeLessThan(2000)
+  expect(metrics.paint?.firstPaint, 'First Paint is less than 1000ms').toBeLessThan(1000)
+  expect(metrics.largestContentfulPaint, 'Largest Contentful Paint is less than 2500ms').toBeLessThan(2500)
+  expect(metrics.cumulativeLayoutShift, 'Cumulative Layout Shift is less than 0.1').toBeLessThan(0.1)
+  expect(metrics.totalBlockingTime, 'Total Blocking Time is less than 500ms').toBeLessThan(500)
+  expect(metrics.totalBytes, 'Total bytes is less than 1.5 MB').toBeLessThan(1024 * 1024 * 1.5)
+  expect(metrics.timeToFirstByte?.total, 'Time to first byte is less than 900ms').toBeLessThan(900)
+  expect(metrics.timeToFirstByte.dns, 'DNS time is less than 100ms').toBeLessThan(100)
+  expect(metrics.timeToFirstByte.wait, 'Wait time is less than 100ms').toBeLessThan(100)
+  expect(metrics.timeToFirstByte.redirect, 'Redirect time is less than 100ms').toBeLessThan(100)
+  expect(metrics.timeToFirstByte.tls, 'TLS time is less than 100ms').toBeLessThan(100)
+  expect(metrics.timeToFirstByte.connection, 'Connection time is less than 100ms').toBeLessThan(100)
 });
 ```
 
-With network emulation:
+**With network emulation:**
+
+Library provides predefined presets for network conditions.
+
+- REGULAR_4G
+- SLOW_3G
+- FAST_WIFI
 
 ```typescript
 import { DefaultNetworkPresets } from 'playwright-performance-metrics';
 
 test('measure performance with slow 3G', async ({ page }) => {
   const collector = new PerformanceMetricsCollector(page);
-  
+  await page.goto('https://example.com', { waitUntil: 'networkidle' })
   const metrics = await collector.collectMetrics({
     networkConditions: DefaultNetworkPresets.SLOW_3G,
     timeout: 30000
@@ -159,6 +179,34 @@ test('measure performance with slow 3G', async ({ page }) => {
 });
 ```
 
+**With fixtures:**
+
+```typescript
+// fixture.ts
+
+import { test as base, expect } from '@playwright/test'
+import { PerformanceMetricsCollector } from 'playwright-performance-metrics'
+
+const test = base.extend({
+  collector: async ({ page }, use) => {
+    const collector = new PerformanceMetricsCollector(page)
+    await use(collector)
+  }
+})
+
+export { test, expect }
+
+// test.spec.ts
+
+import { expect, test } from './fixture.ts'
+
+test('measure page performance', async ({ page, collector }) => {
+  await page.goto('https://example.com', { waitUntil: 'networkidle' })
+  const metrics = await collector.collectMetrics()
+  expect(metrics.domCompleteTiming, 'DOM Complete is less than 900ms').toBeLessThan(900)
+  expect(metrics.paint?.firstContentfulPaint, 'First Contentful Paint is less than 2000ms').toBeLessThan(2000)})
+})
+```
 ## API Reference
 
 ### PerformanceMetricsCollector
@@ -173,15 +221,25 @@ constructor(page: Page)
 
 #### Methods
 
-##### collectMetrics(options?: PerformanceOptions): Promise<PerformanceMetrics>
+- ##### collectMetrics(options?: PerformanceOptions): Promise<PerformanceMetrics>
 
-Collects performance metrics from the page.
+```typescript
+  /**
+   * Collect performance metrics from the page.
+   * @param options - Options for metric collection.
+   * @returns Collected performance metrics.
+   */
+```
 
-Options:
-- `timeout`: Collection timeout in milliseconds
-- `initialDelay`: Initial delay before starting collection
-- `retryTimeout`: Maximum time to retry collecting metrics
-- `networkConditions`: Network conditions to emulate
+- ##### options:
+```typescript
+  /** Maximum time to wait for metrics collection (ms) */
+  timeout?: number
+  /** Maximum time to retry collecting metrics (ms) */
+  retryTimeout?: number
+  /** Network emulation settings */
+  networkConditions?: NetworkConditions
+```
 
 ### Network Presets
 

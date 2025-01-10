@@ -62,13 +62,13 @@ class PerformanceMetricsCollector {
    * @returns Collected performance metrics.
    */
   async collectMetrics(options = {}) {
-    const { timeout = 10000, initialDelay = 1000, retryTimeout = 5000, networkConditions } = options
+    const { timeout = 10000, retryTimeout = 5000, networkConditions } = options
     // Initialize network conditions if provided
     if (networkConditions) {
       await this.initialize(networkConditions)
     }
-    // Wait for initial delay
-    await this.page.waitForTimeout(initialDelay)
+    // Wait for page to load
+    await this.page.waitForLoadState('networkidle', { timeout })
     const results = {}
     // Collect navigation timing metrics
     const navigationTiming = await this.page.evaluate(() => {
