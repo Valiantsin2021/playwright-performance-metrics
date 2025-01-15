@@ -15,16 +15,6 @@
 <h3 align="center">A comprehensive performance metrics collector for Playwright tests. Collect and analyze web vital metrics, network timing, and resource usage in your Playwright tests.</h3>
 <img src="img\performance-UI.png" alt="Performance-UI" />
 
-
-## Features
-
-- Collect Web Vitals (LCP, CLS)
-- Network timing metrics (TTFB, resource timing)
-- Network condition emulation (3G, 4G, WiFi)
-- Resource usage tracking
-- TypeScript support
-- Easy integration with Playwright tests
-
 ## Concept
 
 The playwright-performance-metrics plugin introduces a powerful way to measure and assert on web performance metrics directly in your Playwright tests. Unlike traditional end-to-end testing that focuses on functionality, this plugin enables teams to catch performance regressions early and maintain high performance standards through automated testing.
@@ -59,13 +49,16 @@ Both plugins focus on performance testing, but they serve different purposes:
 **Key Features**
 
 - Real-time performance metrics collection during test execution
+- Collect Web Vitals (LCP, CLS)
+- Network timing metrics (TTFB, resource timing)
+- Network condition emulation (3G, 4G, WiFi)
 - Built-in retry mechanisms for reliable measurements
-- Support for Core Web Vitals and other key performance indicators
 - Seamless integration with existing Playwright tests
 - Type definitions for TypeScript support
 - Configurable thresholds and timing options
+- Resource usage tracking
 
-The collectMetrics returns the object containing the collected performance metrics:
+The **collectMetrics** method returns the object containing the collected performance metrics:
 
 ```
   PerformanceMetrics {
@@ -87,6 +80,11 @@ The collectMetrics returns the object containing the collected performance metri
       }
     }
 ```
+
+The **initialize** method accepts the predefined network condition preset (provided via **DefaultNetworkPresets**) or custom options and applies it to the current test run.
+
+
+
 
 **Available Metrics**
 
@@ -125,10 +123,9 @@ import { test } from '@playwright/test';
 import { PerformanceMetricsCollector } from 'playwright-performance-metrics';
 
 test('measure page performance', async ({ page }) => {
-  const collector = new PerformanceMetricsCollector(page);
-  
+  const collector = new PerformanceMetricsCollector();
   await page.goto('https://example.com', { waitUntil: 'networkidle' })
-  const metrics = await collector.collectMetrics({
+  const metrics = await collector.collectMetrics(page, {
     timeout: 10000,
     initialDelay: 1000
   });
@@ -153,7 +150,7 @@ test('measure page performance', async ({ page }) => {
   expect(metrics.timeToFirstByte.redirect, 'Redirect time is less than 100ms').toBeLessThan(100)
   expect(metrics.timeToFirstByte.tls, 'TLS time is less than 100ms').toBeLessThan(100)
   expect(metrics.timeToFirstByte.connection, 'Connection time is less than 100ms').toBeLessThan(100)
-});
+})
 ```
 
 **With network emulation:**
@@ -162,21 +159,23 @@ Library provides predefined presets for network conditions.
 
 - REGULAR_4G
 - SLOW_3G
+- FAST_3G
 - FAST_WIFI
 
 ```typescript
 import { DefaultNetworkPresets } from 'playwright-performance-metrics';
 
 test('measure performance with slow 3G', async ({ page }) => {
-  const collector = new PerformanceMetricsCollector(page);
-  await page.goto('https://example.com', { waitUntil: 'networkidle' })
-  const metrics = await collector.collectMetrics({
-    networkConditions: DefaultNetworkPresets.SLOW_3G,
+  const collector = new PerformanceMetricsCollector();
+  await collector.initialize(page, DefaultNetworkPresets.SLOW_3G)
+  await page.goto('https://example.com')
+  const metrics = await collector.collectMetrics(page, {
     timeout: 30000
-  });
-  
-  console.log('Slow 3G metrics:', metrics);
-});
+  })
+  await collector.cleanup()
+  expect(slowNetworkMetrics.domCompleteTiming).toBeLessThan(25000)
+  console.log('Slow 3G metrics:', metrics)
+})
 ```
 
 **With fixtures:**
@@ -189,7 +188,7 @@ import { PerformanceMetricsCollector } from 'playwright-performance-metrics'
 
 const test = base.extend({
   collector: async ({ page }, use) => {
-    const collector = new PerformanceMetricsCollector(page)
+    const collector = new PerformanceMetricsCollector()
     await use(collector)
   }
 })
@@ -202,43 +201,53 @@ import { expect, test } from './fixture.ts'
 
 test('measure page performance', async ({ page, collector }) => {
   await page.goto('https://example.com', { waitUntil: 'networkidle' })
-  const metrics = await collector.collectMetrics()
+  const metrics = await collector.collectMetrics(page)
   expect(metrics.domCompleteTiming, 'DOM Complete is less than 900ms').toBeLessThan(900)
   expect(metrics.paint?.firstContentfulPaint, 'First Contentful Paint is less than 2000ms').toBeLessThan(2000)})
 })
 ```
+For more examples see tests in the package repository - https://github.com/Valiantsin2021/playwright-performance-metrics
 ## API Reference
 
 ### PerformanceMetricsCollector
 
 Main class for collecting performance metrics.
 
-#### Constructor
+Provides following interfaces:
+
+- DefaultNetworkPresets - network presets object
+- initialize method
+- cleanup method
+- collectMetrics method
+
+**initialize**
 
 ```typescript
-constructor(page: Page)
+  /**
+   * Initialize the collector with optional network conditions.
+   * @param page - Playwright Page instance to collect metrics from.
+   * @param networkConditions - Network conditions to emulate.
+   * @throws Error if CDP session creation fails.
+   */
 ```
 
-#### Methods
-
-- ##### collectMetrics(options?: PerformanceOptions): Promise<PerformanceMetrics>
+**collectMetrics**
 
 ```typescript
   /**
    * Collect performance metrics from the page.
+   * @param page - Playwright page instance
    * @param options - Options for metric collection.
    * @returns Collected performance metrics.
    */
 ```
-
-- ##### options:
+options:
+  
 ```typescript
   /** Maximum time to wait for metrics collection (ms) */
   timeout?: number
   /** Maximum time to retry collecting metrics (ms) */
   retryTimeout?: number
-  /** Network emulation settings */
-  networkConditions?: NetworkConditions
 ```
 
 ### Network Presets
@@ -246,6 +255,7 @@ constructor(page: Page)
 Available network presets:
 - `REGULAR_4G`
 - `SLOW_3G`
+- `FAST_3G`
 - `FAST_WIFI`
 
 ## Contributing

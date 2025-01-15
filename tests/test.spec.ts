@@ -1,14 +1,19 @@
 // @ts-nocheck
-import { chromium, expect, test } from '@playwright/test'
+import { test as baseTest, chromium, expect } from '@playwright/test'
 import { DefaultNetworkPresets, PerformanceMetricsCollector } from '../src/performance-metrics'
 
-test('Measure website performance default options', async () => {
+const test = baseTest.extend<{ collector: PerformanceMetricsCollector }>({
+  collector: async ({}, use) => {
+    const collector = new PerformanceMetricsCollector()
+    await use(collector)
+  }
+})
+test('Measure website performance default options', async ({ collector }) => {
   const browser = await chromium.launch()
   const context = await browser.newContext()
   const page = await context.newPage()
-  const collector = new PerformanceMetricsCollector(page)
   await page.goto('')
-  const basicMetrics = await collector.collectMetrics({
+  const basicMetrics = await collector.collectMetrics(page, {
     timeout: 15000,
     retryTimeout: 500
   })
@@ -33,21 +38,21 @@ test('Measure website performance default options', async () => {
   expect(basicMetrics.timeToFirstByte?.total).toBeLessThan(900)
   await browser.close()
 })
-test('Slow Network metrics', async () => {
+test('Slow Network metrics example - SLOW_3G preset', async ({ collector }) => {
   const browser = await chromium.launch()
   const context = await browser.newContext()
   const page = await context.newPage()
+  await collector.initialize(page, DefaultNetworkPresets.SLOW_3G)
   await page.goto('')
-  const collector = new PerformanceMetricsCollector(page)
-  const slowNetworkMetrics = await collector.collectMetrics({
-    networkConditions: DefaultNetworkPresets.SLOW_3G,
+  const slowNetworkMetrics = await collector.collectMetrics(page, {
     timeout: 30000
   })
-
+  await collector.cleanup()
   console.log('Slow 3G Metrics:', {
     TTFB: slowNetworkMetrics.timeToFirstByte?.total,
     'DOM Complete': slowNetworkMetrics.domCompleteTiming
   })
+  console.log(slowNetworkMetrics)
   const resourceTiming = await slowNetworkMetrics.resourceTiming('redirection.js')
   if (resourceTiming) {
     console.log('redirection.js Resource Timing:', {
@@ -55,26 +60,37 @@ test('Slow Network metrics', async () => {
       Size: resourceTiming.encodedBodySize
     })
   }
-  expect(slowNetworkMetrics.timeToFirstByte?.total).toBeLessThan(900)
-  expect(slowNetworkMetrics.domCompleteTiming).toBeLessThan(900)
+  expect(slowNetworkMetrics.domCompleteTiming).toBeLessThan(25000)
   expect(resourceTiming.encodedBodySize).toBeGreaterThan(0)
-  expect(slowNetworkMetrics.paint?.firstContentfulPaint).toBeLessThan(2000)
-  expect(slowNetworkMetrics.largestContentfulPaint).toBeLessThan(2500)
+  expect(slowNetworkMetrics.paint?.firstContentfulPaint).toBeGreaterThan(2000)
+  expect(slowNetworkMetrics.largestContentfulPaint).toBeGreaterThan(2000)
   expect(slowNetworkMetrics.cumulativeLayoutShift).toBeLessThan(0.1)
   expect(slowNetworkMetrics.totalBlockingTime).toBeLessThan(500)
   expect(slowNetworkMetrics.timeToFirstByte?.total).toBeLessThan(900)
   await browser.close()
 })
-
-// Example test assertions
-test('Performance requirements are met', async ({ page }) => {
-  const collector = new PerformanceMetricsCollector(page)
-  await page.goto('')
-
-  const metrics = await collector.collectMetrics({
-    networkConditions: DefaultNetworkPresets.REGULAR_4G
+test('Slow Network metrics example - custom options setup', async ({ page, collector }) => {
+  await collector.initialize(page, {
+    offline: false,
+    downloadThroughput: (250 * 1024) / 8, // 250 Kbps
+    uploadThroughput: (250 * 1024) / 8, // 250 Kbps
+    latency: 200 // ms
   })
-
+  await page.goto('')
+  const metrics = await collector.collectMetrics(page)
+  await collector.cleanup()
+  console.log(metrics)
+  expect(metrics.domCompleteTiming).toBeGreaterThan(25000)
+  expect(metrics.pageloadTiming).toBeGreaterThan(25000)
+  expect(metrics.paint?.firstContentfulPaint).toBeGreaterThan(2000)
+  expect(metrics.largestContentfulPaint).toBeGreaterThan(2500)
+  expect(metrics.cumulativeLayoutShift).toBeLessThan(0.1)
+  expect(metrics.totalBlockingTime).toBeLessThan(500)
+  expect(metrics.timeToFirstByte?.total).toBeLessThan(900)
+})
+test('Performance requirements are met', async ({ page, collector }) => {
+  await page.goto('')
+  const metrics = await collector.collectMetrics(page)
   // Performance budget assertions
   expect(metrics.paint?.firstContentfulPaint).toBeLessThan(2000)
   expect(metrics.largestContentfulPaint).toBeLessThan(2500)

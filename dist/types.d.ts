@@ -1,3 +1,4 @@
+import { Page } from '@playwright/test'
 /**
  * Network condition configuration options
  * @property offline - Whether to emulate offline mode
@@ -19,15 +20,12 @@ export interface NetworkConditions {
  * Configuration options for performance metrics collection
  * @property timeout - Maximum time to wait for metrics collection
  * @property retryTimeout - Maximum time to retry collecting metrics
- * @property networkConditions - Network emulation settings
  */
 export interface PerformanceOptions {
   /** Maximum time to wait for metrics collection (ms) */
   timeout?: number
   /** Maximum time to retry collecting metrics (ms) */
   retryTimeout?: number
-  /** Network emulation settings */
-  networkConditions?: NetworkConditions
 }
 /**
  * Time to First Byte (TTFB) metrics breakdown
@@ -84,8 +82,10 @@ export interface PerformanceMetrics {
 export interface NetworkPresets {
   /** 4G network conditions */
   REGULAR_4G: NetworkConditions
-  /** 3G network conditions */
+  /** Slow 3G network conditions */
   SLOW_3G: NetworkConditions
+  /** Fast 3G network conditions */
+  FAST_3G: NetworkConditions
   /** Fast WiFi network conditions */
   FAST_WIFI: NetworkConditions
 }
@@ -93,12 +93,18 @@ export interface NetworkPresets {
  * Performance metrics collector class interface
  */
 export interface IPerformanceMetricsCollector {
-  /** Initialize the collector */
-  initialize(networkConditions?: NetworkConditions): Promise<void>
+  /** Initialize the collector
+   * @param page - Playwright Page instance to collect metrics from
+   * @param networkConditions - Network conditions to emulate
+   */
+  initialize(page: Page, networkConditions?: NetworkConditions): Promise<void>
   /** Cleanup resources */
   cleanup(): Promise<void>
-  /** Collect performance metrics */
-  collectMetrics(options?: PerformanceOptions): Promise<PerformanceMetrics>
+  /** Collect performance metrics
+   * @param page - Playwright Page instance to collect metrics from
+   * @param options - Options for metric collection
+   */
+  collectMetrics(page: Page, options?: PerformanceOptions): Promise<PerformanceMetrics>
 }
 /**
  * Custom type for resource timing function
