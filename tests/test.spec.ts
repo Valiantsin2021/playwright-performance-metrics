@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { test as baseTest, chromium, expect } from '@playwright/test'
-import { DefaultNetworkPresets, PerformanceMetricsCollector } from '../src/performance-metrics'
+import { DefaultNetworkPresets, PerformanceMetricsCollector } from 'playwright-performance-metrics'
 
 const test = baseTest.extend<{ collector: PerformanceMetricsCollector }>({
   collector: async ({}, use) => {

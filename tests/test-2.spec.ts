@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { test as baseTest, expect } from '@playwright/test'
 import fs from 'fs'
-import { PerformanceMetricsCollector } from '../src/performance-metrics'
+import { PerformanceMetricsCollector } from 'playwright-performance-metrics'
 
 const test = baseTest.extend<{ collector: PerformanceMetricsCollector }>({
   collector: async ({ page }, use) => {

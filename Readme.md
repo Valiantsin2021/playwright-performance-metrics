@@ -21,6 +21,12 @@ The playwright-performance-metrics plugin introduces a powerful way to measure a
 
 This plugin does not have external dependencies.
 
+Collect performance metrics from the browser dev tools during playwright test execution
+
+
+> [!CAUTION] This library is work in progress. The measurement is limited to Chromium family browsers.
+
+
 **Comparison with playwright-lighthouse**
 
 Both plugins focus on performance testing, but they serve different purposes:
@@ -82,8 +88,6 @@ The **collectMetrics** method returns the object containing the collected perfor
 ```
 
 The **initialize** method accepts the predefined network condition preset (provided via **DefaultNetworkPresets**) or custom options and applies it to the current test run.
-
-
 
 
 **Available Metrics**
@@ -207,6 +211,7 @@ test('measure page performance', async ({ page, collector }) => {
 })
 ```
 For more examples see tests in the package repository - https://github.com/Valiantsin2021/playwright-performance-metrics
+
 ## API Reference
 
 ### PerformanceMetricsCollector
