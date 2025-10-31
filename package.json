@@ -23,7 +23,8 @@
     "publishd": "npm publish --dry-run",
     "preversion": "npm run lint",
     "version": "git add -A src",
-    "postversion": "git push && git push --tags"
+    "postversion": "git push && git push --tags",
+    "bump": "npx -y npm-check-updates -u && npm prune"
   },
   "keywords": [
     "playwright",
@@ -32,7 +33,7 @@
     "web-vitals",
     "testing"
   ],
-  "author": "Your Name",
+  "author": "Valentin Lutchanka",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -65,16 +66,16 @@
     }
   },
   "devDependencies": {
-    "@commitlint/cli": "^19.7.1",
-    "@commitlint/config-conventional": "19.7.1",
-    "@playwright/test": "^1.50.1",
-    "@types/node": "22.13.4",
-    "eslint": "9.20.1",
-    "eslint-config-prettier": "10.0.1",
-    "eslint-plugin-prettier": "5.2.3",
-    "prettier": "3.5.1",
-    "typescript": "^5.7.3",
-    "typescript-eslint": "^8.24.0"
+    "@commitlint/cli": "^20.1.0",
+    "@commitlint/config-conventional": "20.0.0",
+    "@playwright/test": "^1.56.1",
+    "@types/node": "24.9.2",
+    "eslint": "9.38.0",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-prettier": "5.5.4",
+    "prettier": "3.6.2",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.2"
   },
   "engines": {
     "node": ">=18.0.0"
