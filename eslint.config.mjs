@@ -3,7 +3,11 @@
 import eslint from '@eslint/js'
 import prettierConfig from 'eslint-config-prettier'
 import prettierPlugin from 'eslint-plugin-prettier'
+import path from 'path'
 import tseslint from 'typescript-eslint'
+import { fileURLToPath } from 'url'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 export default tseslint.config(
   eslint.configs.recommended,
@@ -13,7 +17,8 @@ export default tseslint.config(
     languageOptions: {
       parserOptions: {
         projectService: true,
-        tsconfigRootDir: '.'
+        // Ensure tsconfigRootDir is an absolute path — using the config file's directory
+        tsconfigRootDir: __dirname
       }
     },
     rules: {
