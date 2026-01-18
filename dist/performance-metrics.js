@@ -201,8 +201,8 @@ class PerformanceMetricsCollector {
     var _a, _b
     return Boolean(
       results.largestContentfulPaint !== undefined &&
-        ((_a = results.paint) === null || _a === void 0 ? void 0 : _a.firstContentfulPaint) !== undefined &&
-        ((_b = results.paint) === null || _b === void 0 ? void 0 : _b.firstPaint) !== undefined
+      ((_a = results.paint) === null || _a === void 0 ? void 0 : _a.firstContentfulPaint) !== undefined &&
+      ((_b = results.paint) === null || _b === void 0 ? void 0 : _b.firstPaint) !== undefined
     )
   }
 }

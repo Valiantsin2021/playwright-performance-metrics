@@ -1,3 +1,9 @@
+# 1.2.5 (2026-01-15)
+
+### Chore
+
+- update dependencies
+
 # 1.2.1 (2025-01-15)
 
 ### Enhancements
