@@ -1,6 +1,5 @@
 // @ts-check
 
-import eslint from '@eslint/js'
 import prettierConfig from 'eslint-config-prettier'
 import prettierPlugin from 'eslint-plugin-prettier'
 import path from 'path'
@@ -10,7 +9,6 @@ import { fileURLToPath } from 'url'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 export default tseslint.config(
-  eslint.configs.recommended,
   ...tseslint.configs.recommendedTypeChecked,
   prettierConfig,
   {

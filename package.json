@@ -1,6 +1,6 @@
 {
   "name": "playwright-performance-metrics",
-  "version": "1.2.5",
+  "version": "1.2.6",
   "description": "A performance metrics collection library for Playwright",
   "exports": {
     ".": "./dist/index.js"
@@ -66,18 +66,18 @@
     }
   },
   "devDependencies": {
-    "@commitlint/cli": "^20.3.1",
-    "@commitlint/config-conventional": "20.3.1",
-    "@playwright/test": "^1.57.0",
-    "@types/node": "25.0.9",
-    "eslint": "9.39.2",
+    "@commitlint/cli": "^20.5.0",
+    "@commitlint/config-conventional": "20.5.0",
+    "@playwright/test": "^1.59.1",
+    "@types/node": "25.5.2",
+    "eslint": "10.2.0",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-prettier": "5.5.5",
-    "prettier": "3.8.0",
-    "typescript": "^5.9.3",
-    "typescript-eslint": "^8.53.0"
+    "prettier": "3.8.1",
+    "typescript": "^6.0.2",
+    "typescript-eslint": "^8.58.0"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=20.0.0"
   }
 }

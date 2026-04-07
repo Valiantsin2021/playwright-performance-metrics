@@ -1,3 +1,9 @@
+# 1.2.6 (2026-04-07)
+
+### Chore
+
+- update dependencies
+
 # 1.2.5 (2026-01-15)
 
 ### Chore
